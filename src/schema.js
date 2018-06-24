@@ -20,7 +20,12 @@ exports.typeDefs = gql`
   }
 
   type Query {
-    getQuestions(limit: Int, score: Int, sort: String, tags: String): [Question]
+    getQuestions(
+      limit: Int
+      score: Int
+      sort: String
+      tags: String!
+    ): [Question]
   }
 `;
 
@@ -29,11 +34,9 @@ exports.resolvers = {
     getQuestions(root, args) {
       return axios
         .get(
-          `https://api.stackexchange.com/2.2/questions?&site=stackoverflow&pagesize=${
-            args.limit
-          }&order=desc&score=${args.score}&sort=${
-            args.sort
-          }&tagged=javascript;${args.tags}`
+          `https://api.stackexchange.com/2.2/questions?&site=stackoverflow&pagesize=${args.limit ||
+            10}&order=desc&score=${args.score || 100}&sort=${args.sort ||
+            "votes"}&tagged=javascript;${args.tags}`
         )
         .then(response => {
           return response.data.items.map(question => {
