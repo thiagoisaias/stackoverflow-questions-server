@@ -1,4 +1,4 @@
-const axios = require("axios");
+const { axios } = require("./axios");
 const { gql } = require("apollo-server-express");
 
 exports.typeDefs = gql`
@@ -13,7 +13,7 @@ exports.typeDefs = gql`
     createdAt: String
     numberOfAnswers: Int
     score: Int
-    tags: String
+    tags: [String]
     title: String
     url: String
     user: User
@@ -21,8 +21,8 @@ exports.typeDefs = gql`
 
   type Query {
     getQuestions(
-      limit: Int
-      score: Int
+      limit: String
+      score: String
       sort: String
       tags: String!
     ): [Question]
@@ -34,8 +34,8 @@ exports.resolvers = {
     getQuestions(root, args) {
       return axios
         .get(
-          `https://api.stackexchange.com/2.2/questions?&site=stackoverflow&pagesize=${args.limit ||
-            10}&order=desc&score=${args.score || 100}&sort=${args.sort ||
+          `/questions?&site=stackoverflow&pagesize=${args.limit ||
+            10}&order=asc&min=${args.score || 5}&sort=${args.sort ||
             "votes"}&tagged=javascript;${args.tags}`
         )
         .then(response => {
