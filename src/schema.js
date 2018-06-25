@@ -32,11 +32,15 @@ exports.typeDefs = gql`
 exports.resolvers = {
   Query: {
     getQuestions(root, args) {
+      const minTerm = `&min=${args.score || 5}`;
+      const sortTerm = `&sort=${args.sort || "votes"}`;
+      const orderTerm = `&order=asc`;
+      const tagTerm = `&tagged=javascript;${args.tags}`;
+      const limitTerm = `&pagesize=${args.limit || 10}`;
+
       return axios
         .get(
-          `/questions?&site=stackoverflow&pagesize=${args.limit ||
-            10}&order=asc&min=${args.score || 5}&sort=${args.sort ||
-            "votes"}&tagged=javascript;${args.tags}`
+          `/questions?&site=stackoverflow${minTerm}${tagTerm}${limitTerm}${sortTerm}${orderTerm}`
         )
         .then(response => {
           return response.data.items.map(question => {
